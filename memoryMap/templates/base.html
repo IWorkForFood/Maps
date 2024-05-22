@@ -1,0 +1,98 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui;
+        }
+        .navbar{
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .nav-link , .navbar-brand{
+         color: #f4f4f4;
+         cursor: pointer;
+         text-decoration: none;
+        }
+        .nav-link{
+         margin-right: 1em !important;
+
+        }
+        .nav-link:hover{
+         background: #f4f4f4;
+         color: #f97300;
+        }
+        .navbar-collapse{
+         display: flex;
+         justify-content: flex-end;
+
+        }
+        .navbar-list{
+            display: flex;
+            justify-content: flex-end;
+            list-style-type: none;
+        }
+        header {
+            background-color: #E27D60;
+            color: white;
+            padding: 10px 0;
+            width: 100%;
+            font-family: Mistral;
+            font-size: 16px;
+            line-height: 1.5;
+            font-style: oblique;
+        }
+        footer {
+            background-color: #E27D60;
+            color: white;
+            padding: 10px 0;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+    {% block filling %}Default Title{% endblock %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://unpkg.com/@vkid/sdk@latest/dist-sdk/umd/index.js"></script>
+
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg fixed-top ">
+           <a class="navbar-brand" href="#">Home</a>
+            <div class="navbar-collapse">
+                 <ul class="navbar-list">
+
+                   <li class="nav-item">
+                     <a class="nav-link" href="#">About</a>
+                   </li>
+                   <li class="nav-item">
+                     <a class="nav-link " href="#">Portfolio</a>
+                   </li>
+                   <li class="nav-item">
+                     <a class="nav-link " href="#">Team</a>
+                   </li>
+                   <li class="nav-item">
+                     <a class="nav-link " href="#">Post</a>
+                   </li>
+                   <li class="nav-item">
+                     <a class="nav-link " href="#">Contact</a>
+                   </li>
+                 </ul>
+
+            </div>
+        </nav>
+
+    </header>
+
+        {% block content %}{% endblock %}
+
+    <footer>&copy; Все права не защищены</footer>
+</body>
+</html>

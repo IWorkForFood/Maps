@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block filling %}
+    <title>Определение адреса клика на карте с помощью обратного геокодирования</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <!--
+        Укажите свой API-ключ. Тестовый ключ НЕ БУДЕТ работать на других сайтах.
+        Получить ключ можно в Кабинете разработчика: https://developer.tech.yandex.ru/keys/
+    -->
+     <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&amp;apikey=cb3e3afa-4b49-48bb-b7bf-896941815e44" type="text/javascript"></script>
+    <script src="event_reverse_geocode.js" type="text/javascript"></script>
+    <style type="text/css">
+        html, body {
+            width: 100%;
+            height: 95%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial;
+            font-size: 14px;
+        }
+        #map {
+            width: 50%;
+            height: 80vh;
+            float: left;
+        }
+        .header {
+            padding: 5px;
+        }
+        input[name="x_location"],
+        input[name="y_location"]{
+            display: none;
+        }
+        map-form-wrapper{
+            width: 50%;
+            height: 100%;
+        }
+        .map-form{
+            display: block;
+            height: 80%;
+            margin:0 auto;
+            padding: 0px 100px 100px 100px;
+        }
+
+
+        .map-form input[type=text]{
+            padding: 12px 30px;
+            border: none;
+            background-color: #eee;
+            color: #ffffff;
+            font-size: 16px;
+            border: 1px solid #bdbdbd;
+            border-radius: 0.25rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            margin:0 auto;
+            margin-bottom: 20px;
+        }
+        .map-form textarea{
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        .map-form button[type=submit]{
+            padding: 12px 30px;
+            border: none;
+            background-color: #eee;
+            color: #ffffff;
+            font-size: 16px;
+        }
+        .map-form p span{
+            margin-bottom: 10px;
+        }
+
+        .data-dad{
+          width: 100%;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: stretch;
+          margin-top: 20px;
+          margin-bottom: 20px;
+        }
+
+            .container-wrap2{
+                width: 100%;
+                height: auto;
+                background: #eee;
+                padding: 10px 10px;
+            }
+
+            .container-2{
+                display: flex;
+                flex-direction: row;
+                align-content: stretch;
+            }
+            .Into_info{
+                height: 100px;
+
+            }
+            .info{
+                width: 100%;
+                background: aquamarine;
+                margin-bottom: 10px;
+            }
+            .info{
+                background: transparent;
+            }
+            .info-in{
+                padding: 20px 40px;
+                background: #fff;
+                box-shadow: 0px 2px 3px 0px #ddd;
+            }
+            .info_list{
+                padding-left: 30px;
+            }
+            .info p{
+                margin: 10px 0px;
+                word-spacing: 2px;
+                letter-spacing: 1px;
+            }
+            .info_list li{
+                margin: 5px 0px;
+
+            }
+
+    </style>
+{% endblock %}
+{% block content %}
+<div class = "container-wrap2">
+    <div class = "container-2">
+        <div class="info">
+            <div class="info-in">
+                <p class="header">Кликните по карте, чтобы выбрать расположение</p>
+                <div class="data-dad">
+                    <div id="map"></div>
+                    <div class="map-form-wrapper">
+                        <form class="map-form" method='post'>
+                            {% csrf_token %}
+                            <p><span>{{ marker_form.places_name.label }}</span><br/><br/>{{ marker_form.places_name }}</p>
+                            <p><span>{{ marker_form.about_place.label }}</span><br/><br/>{{ marker_form.about_place }}</p>
+                            {{ marker_form.x_location }}
+                            {{ marker_form.y_location }}
+                            <p><button type="submit">Сохранить</button></p>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+         </div>
+     </div>
+ </div>
+</body>
+</html>
+
+    <script type="text/javascript">
+      const x_l = document.querySelector("input[name='x_location']")
+      const y_l = document.querySelector("input[name='y_location']")
+
+      ymaps.ready(init);
+
+      function init() {
+          var centerPoint = [55.753994, 37.622093]
+          {% if marked_place %}
+
+          centerPoint = [{{ marked_place.x_location | safe}}, {{ marked_place.y_location | safe}}]
+
+          {% endif %}
+
+          var myPlacemark,
+              myMap = new ymaps.Map('map', {
+                  center: centerPoint,
+                  zoom: 9
+              }, {
+                  searchControlProvider: 'yandex#search'
+              });
+
+            {% if marked_place %}
+            // Создаем второй статический маркер
+            var mySecondPlacemark = new ymaps.Placemark(centerPoint, {
+                balloonContent: '{{marked_place.places_name}}',
+                iconCaption: 'Текущая позиция'
+            }, {
+                preset: 'islands#blueCircleIcon'
+            });
+
+            // Добавляем второй маркер на карту
+            myMap.geoObjects.add(mySecondPlacemark);
+            {% endif %}
+
+          // Слушаем клик на карте.
+          myMap.events.add('click', function (e) {
+              var coords = e.get('coords');
+
+
+              // Если метка уже создана – просто передвигаем ее.
+              if (myPlacemark) {
+                  myPlacemark.geometry.setCoordinates(coords);
+              }
+              // Если нет – создаем.
+              else {
+                  myPlacemark = createPlacemark(coords);
+                  myMap.geoObjects.add(myPlacemark);
+                  // Слушаем событие окончания перетаскивания на метке.
+                  myPlacemark.events.add('dragend', function () {
+                      getAddress(myPlacemark.geometry.getCoordinates());
+                  });
+              }
+              getAddress(coords);
+              console.log(coords);
+              x_l.value = coords[0]
+              y_l.value = coords[1]
+          });
+
+          // Создание метки.
+          function createPlacemark(coords) {
+              return new ymaps.Placemark(coords, {
+                  iconCaption: 'поиск...'
+              }, {
+                  preset: 'islands#violetDotIconWithCaption',
+                  draggable: true
+              });
+          }
+
+          // Определяем адрес по координатам (обратное геокодирование).
+          function getAddress(coords) {
+              myPlacemark.properties.set('iconCaption');
+              ymaps.geocode(coords).then(function (res) {
+                  var firstGeoObject = res.geoObjects.get(0);
+
+                  myPlacemark.properties
+                      .set({
+                          // Формируем строку с данными об объекте.
+                          iconCaption: [
+                              // Название населенного пункта или вышестоящее административно-территориальное образование.
+                              firstGeoObject.getLocalities().length ? firstGeoObject.getLocalities() : firstGeoObject.getAdministrativeAreas(),
+                              // Получаем путь до топонима, если метод вернул null, запрашиваем наименование здания.
+                              firstGeoObject.getThoroughfare() || firstGeoObject.getPremise()
+                          ].filter(Boolean).join(', '),
+                          // В качестве контента балуна задаем строку с адресом объекта.
+                          balloonContent: firstGeoObject.getAddressLine()
+                      });
+              });
+          }
+      }
+
+    </script>
+{% endblock %}

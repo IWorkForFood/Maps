@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://unpkg.com/@vkid/sdk@latest/dist-sdk/umd/index.js"></script>
+</head>
+<body>
+
+<div id="VkIdSdkOneTap"></div>
+
+<script>
+
+
+
+    function generateRandomState(length) {
+      let result = '';
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      const charactersLength = characters.length;
+      for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+      return result;
+    }
+
+    const randomState = generateRandomState(10); // Генерация строки состояния длиной 10 символов
+    console.log(randomState);
+
+    const VKID = window.VKIDSDK;
+    VKID.Config.set({
+      app: '51926135', // Идентификатор приложения.
+      redirectUrl: 'https://hasta-la-vista-oldster.ru/', // Адрес для перехода после авторизации.
+      state: randomState // Произвольная строка состояния приложения.
+    });
+
+    // Создание экземпляра кнопки.
+    const oneTap = new VKID.OneTap();
+
+    // Получение контейнера из разметки.
+    const container = document.getElementById('VkIdSdkOneTap');
+
+    // Проверка наличия кнопки в разметке.
+    if (container) {
+      // Отрисовка кнопки в контейнере с именем приложения APP_NAME, светлой темой и на русском языке.
+      oneTap.render({ container: container, scheme: VKID.Scheme.LIGHT, lang: VKID.Languages.RUS });
+    }
+
+</script>
+
+
+</body>
+</html>
