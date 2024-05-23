@@ -11,12 +11,15 @@ class MarkedPlaces(models.Model):
     about_place = models.CharField(max_length=10000)
     x_location = models.FloatField()
     y_location = models.FloatField()
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, default=None, null=True, on_delete=models.CASCADE)
-
+    user = models.ForeignKey('Users', default=None, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.places_name
 
     def get_absolute_url(self):
         return reverse('editMemory', kwargs={'mark_id', self.pk})
+
+class Users(models.Model):
+    vk_id = models.CharField(max_length=1000)
+
 

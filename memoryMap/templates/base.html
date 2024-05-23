@@ -55,6 +55,9 @@
             width: 100%;
             text-align: center;
         }
+        #profile_img{
+            border-raduis: 50%;
+        }
     </style>
     {% block filling %}Default Title{% endblock %}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -64,26 +67,18 @@
 
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg fixed-top ">
-           <a class="navbar-brand" href="#">Home</a>
+        <nav class="navbar">
+           <a class="navbar-brand" href="#">
+               {{request.session.first_name}}
+                <img id="profile_img" width="20px" height="20px" src='{{request.session.photo_200}}'/>
+           </a>
             <div class="navbar-collapse">
                  <ul class="navbar-list">
 
                    <li class="nav-item">
-                     <a class="nav-link" href="#">About</a>
+                     <a class="nav-link" href="..\">Выйти</a>
                    </li>
                    <li class="nav-item">
-                     <a class="nav-link " href="#">Portfolio</a>
-                   </li>
-                   <li class="nav-item">
-                     <a class="nav-link " href="#">Team</a>
-                   </li>
-                   <li class="nav-item">
-                     <a class="nav-link " href="#">Post</a>
-                   </li>
-                   <li class="nav-item">
-                     <a class="nav-link " href="#">Contact</a>
-                   </li>
                  </ul>
 
             </div>
