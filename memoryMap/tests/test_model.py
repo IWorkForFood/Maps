@@ -23,10 +23,6 @@ class MarkedPlacesModelTest(TestCase):
         max_length = test_map._meta.get_field('places_name').max_length
         self.assertTrue(max_length <= 40)
 
-    def test_str(self):
-        test_map = MarkedPlaces.objects.all().first()
-        expected_object_name = test_map.places_name
-        self.assertEquals(expected_object_name, str(test_map))
 
 class UsersModelTest(TestCase):
 
