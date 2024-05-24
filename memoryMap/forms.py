@@ -1,6 +1,9 @@
 from django import forms
 
 class MarkerForm(forms.Form):
+    """
+    The form for memories/impressions creation
+    """
 
     places_name = forms.CharField(label='Название места', max_length=40, required=True)
     about_place = forms.CharField(widget=forms.Textarea(

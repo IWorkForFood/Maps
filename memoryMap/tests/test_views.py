@@ -9,7 +9,6 @@ class MemoriesViewTest(TestCase):
     """
     Test view memories(Ruturn list of impressions)
     """
-
     @classmethod
     def setUpTestData(cls):
         cls.vk_user = Users.objects.create(vk_id="1234")
@@ -42,11 +41,9 @@ class MemoriesViewTest(TestCase):
         self.assertEqual([model_to_dict(x) for x in resp.context['places_cards']], [{'id': 1, 'places_name': 'TestName', 'about_place': 'TestDescription', 'x_location': 45.325, 'y_location': 23.343, 'user': 1}, {'id': 2, 'places_name': 'TestName', 'about_place': 'TestDescription', 'x_location': 45.325, 'y_location': 23.343, 'user': 1}])
 
 class MapViewTest(TestCase):
-
     """
     Test view Map(Create impression about place)
     """
-
     @classmethod
     def setUpTestData(cls):
         cls.factory = RequestFactory()

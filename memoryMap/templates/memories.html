@@ -125,7 +125,38 @@
         display: block;
         background: #fff;
     }
+    .button-saver{
+        width: 100%;
+        padding: 10px 0px;
+        align-items: center;
+        text-align: center;
+    }
+     .add-place {
+        display: inline-block;
+        padding: 10px 20px;
+        text-align: center;
+        font-size: 16px;
+        font-weight: bold;
+        color: white;
+        background-color: #007bff;
+        border-radius: 5px;
+        text-transform: uppercase;
+        text-decoration: none;
+        transition: background-color 0.3s;
+    }
 
+    .add-place:hover {
+        background-color: #0056b3;
+        text-decoration: none;
+    }
+    .very_sad{
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        height: 69vh;
+        align-items: center;
+        text-align: center;
+    }
 </style>
 {% endblock %}
 {% block content %}
@@ -135,6 +166,9 @@
         <div class="info">
             <div class="info-in">
                 <div class="tetris">
+                {% if not places_cards %}
+                <div class="very_sad"><span>Нет воспоминаний</span></div>
+                {% endif %}
                 {% if places_cards %}
                         {% for card in places_cards %}
 
@@ -159,7 +193,8 @@
                 </a>
                         {% endfor %}
                 {% endif %}
-                <a class="add-place" href="/map/">Добавить воспоминание{{user_id}}</a>
+
+                <div class = "button-saver"><a class="add-place" href="/map/">Добавить воспоминание{{user_id}}</a></div>
                </div>
             </div>
         </div>
