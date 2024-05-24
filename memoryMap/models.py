@@ -7,8 +7,8 @@ from django.urls import reverse
 # Create your models here.
 
 class MarkedPlaces(models.Model):
-    places_name = models.CharField(max_length=100)
-    about_place = models.CharField(max_length=10000)
+    places_name = models.CharField(max_length=40, verbose_name='Название места')
+    about_place = models.CharField(max_length=10000, verbose_name='О месте')
     x_location = models.FloatField()
     y_location = models.FloatField()
     user = models.ForeignKey('Users', default=None, null=True, on_delete=models.CASCADE)
@@ -16,10 +16,8 @@ class MarkedPlaces(models.Model):
     def __str__(self):
         return self.places_name
 
-    def get_absolute_url(self):
-        return reverse('editMemory', kwargs={'mark_id', self.pk})
 
 class Users(models.Model):
-    vk_id = models.CharField(max_length=1000)
+    vk_id = models.CharField(max_length=1000, verbose_name='id зашедшего пользователя в вк')
 
 

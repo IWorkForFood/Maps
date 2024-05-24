@@ -39,6 +39,7 @@ class Map(View):
                 y_location=marker_form.cleaned_data['y_location'],
                 user=curr_user
             )
+            print("New Marked Place has been created: ", new_marked_place)
             new_marked_place.save()
 
             return redirect('/memories/')
@@ -48,8 +49,6 @@ def start(request):
     return render(request, 'RegLog.html', {})
 
 def memories(request):
-    print(request.session.get('user_id', None))
-
     user_vk_id = request.session.get('user_id', None)
     if user_vk_id is None:
         return HttpResponse("Отсутствует vk_id в сессии пользователя.")
@@ -82,24 +81,6 @@ def edit_memory(request, mark_id):
             return redirect('/memories/')
 
     return render(request, 'map.html', {'marker_form': marker_form})
-
-def get_user_data(request):
-    if request.method == 'POST':
-        silent_token = request.POST.get('silentToken')
-
-        if silent_token:
-            # Отправка silent token на сервер VKID для получения данных пользователя
-            response = requests.post('https://api.vkid.com/getUserData', data={'silentToken': silent_token})
-
-            if response.status_code == 200:
-                user_data = response.json()
-                # Обработка данных пользователя, сохранение в базу данных или другие действия
-
-                return JsonResponse({'success': True, 'userData': user_data})
-
-        return JsonResponse({'success': False, 'message': 'Invalid silent token'})
-
-    return JsonResponse({'success': False, 'message': 'Method not allowed'})
 
 def insertUser(request, id, first_name, photo_200):
 

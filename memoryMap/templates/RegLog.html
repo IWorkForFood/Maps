@@ -1,11 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Page</title>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://unpkg.com/@vkid/sdk@latest/dist-sdk/umd/index.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url('world_map_background.jpg');
+            background-size: cover;
+            background-position: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .content {
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+    </style>
 </head>
 <body>
+    <div class="container">
+        <div class="content">
+            <h1>Добро пожаловать на наш сайт</h1>
+            <p>Отмечайте самые запоминающиеся места вместе с нами!</p>
+            <div id="VkIdSdkOneTap"></div>
+        </div>
+    </div>
 
-<div id="VkIdSdkOneTap"></div>
+
 
 <script>
 
