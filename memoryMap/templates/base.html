@@ -56,7 +56,9 @@
             text-align: center;
         }
         #profile_img{
-            border-raduis: 50%;
+            border-radius: 50%;
+            float: left;
+            margin: 0px 5px;
         }
     </style>
     {% block filling %}Default Title{% endblock %}
@@ -69,8 +71,8 @@
     <header>
         <nav class="navbar">
            <a class="navbar-brand" href="#">
-               {{request.session.first_name}}
                 <img id="profile_img" width="20px" height="20px" src='{{request.session.photo_200}}'/>
+                <span>{{request.session.first_name}}</span>
            </a>
             <div class="navbar-collapse">
                  <ul class="navbar-list">

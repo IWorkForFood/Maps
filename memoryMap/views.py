@@ -1,10 +1,9 @@
 """Views"""
-
 import json
+import urllib
 from urllib.parse import urlencode
-from django.core.serializers import json
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse
 from django.views import View
 import requests
 from memoryMap.forms import MarkerForm
@@ -64,6 +63,7 @@ def start(request):
     """
     Open welcome page
     """
+    request.session.clear()
     return render(request, 'RegLog.html', {})
 
 def memories(request):
@@ -125,72 +125,58 @@ def edit_memory(request, mark_id):
     return render(request, 'map.html', {'marker_form': marker_form})
 
 def auth(request):
-
     """
     Designed for authentication via VK
 
     When the user logs in, the VK ID SDK will
-    send a Silent token(token from the playlis) in response.
+    send a Silent token(temporary_token from the playlis) in response.
     After receiving the authorization result,
     we exchange the received Silent token for an Access token
     For this we send http request to the url
     Then we receive personal data of user using Access token
     :return: JsonResponse due to unplaned cases, render in case of success
     """
+    response = request.GET.get('payload')
+    payload = json.loads(response)
+    user_uuid = payload['uuid']
+    temporary_token = payload['token']
 
-    open_counter = request.session['open_counter'] = request.session.get('open_counter', 0)+1
+    payload = {
+        'v': "5.131",
+        'token': temporary_token,
+        'access_token': '422847434228474342284743bc4130133444228422847432460238e4efb6cadf0d808ea',
+        'uuid': user_uuid,
+    }
+    encoded_params = urllib.parse.urlencode(payload)
+    full_url = f"https://api.vk.com/method/auth.exchangeSilentAuthToken?{encoded_params}"
 
-    if open_counter==1:
-        service_token = '422847434228474342284743bc4130133444228422847432460238e4efb6cadf0d808ea'
-        if request.method == 'GET':
-            payload = request.GET.get('payload')
+    server_response = requests.get(full_url)
+    response_data = server_response.json()
 
-            if payload:
-                payload = json.loads(payload)
-                url = "https://api.vk.com/method/auth.exchangeSilentAuthToken"
+    permanent_access_token = response_data['response']['access_token']
+    vk_user_id = response_data['response']['user_id']
+    requested_fields = 'photo_200'
 
-                params = {
-                    'v': "5.131",
-                    'token': payload["token"],
-                    'access_token': service_token,
-                    'uuid': payload["uuid"],
-                }
+    user_payload = {
+        'v': "5.199",
+        'access_token': permanent_access_token,
+        'fields': requested_fields,
+    }
+    user_response = requests.get("https://api.vk.com/method/users.get",
+                                 params=user_payload)
+    user_data = user_response.json()
+    user_info = user_data['response'][0]
 
-                query_string = urlencode(params)
-                url = f'{url}?{query_string}'
+    user_first_name = user_info['first_name']
+    user_photo = user_info['photo_200']
+    vk_user_identifier = vk_user_id
 
-                response = requests.post(url)
-                first_data = response.json()["response"]
+    if not Users.objects.filter(vk_id=vk_user_identifier).exists():
+        user_entry = Users(vk_id=vk_user_identifier)
+        user_entry.save()
 
-                url = "https://api.vk.com/method/users.get"
+    request.session['first_name'] = user_first_name
+    request.session['photo_200'] = user_photo
+    request.session['user_id'] = vk_user_identifier
 
-                params = {
-                    'v': "5.199",
-                    'access_token': first_data['access_token'],
-                    'fields': "photo_200",
-                }
-
-                second_data = {}
-
-                query_string = urlencode(params)
-                url = f"{url}?{query_string}"
-                response = requests.post(url)
-                second_data = json.loads(response.content)["response"]
-                first_name = request.session['first_name'] = second_data[0]['first_name']
-                photo_200 = request.session['photo_200'] = second_data[0]['photo_200']
-                vk_id = request.session['user_id'] = second_data[0]['id']
-
-                if not Users.objects.filter(vk_id = vk_id):
-                    new_user = Users(vk_id = vk_id)
-                    new_user.save()
-                request.session['first_name'] = first_name
-                request.session['photo_200'] = photo_200
-                request.session['user_id'] = vk_id
-
-                return render(request, 'memories.html')
-
-            return JsonResponse({'success': False, 'message': 'Invalid silent token'})
-
-        return JsonResponse({'success': False, 'message': 'Method not allowed'})
-
-    return render(request, 'memories.html')
+    return redirect('/memories/')
